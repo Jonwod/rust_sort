@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use std::fmt::Display;
 use std::cmp::PartialOrd;
 
@@ -73,16 +75,58 @@ fn insertion_sort<T: PartialOrd + Copy>(a: &mut [T]) {
 }
 
 
+// Given sorted arrays a and b, merges them into sorted output Vector
+fn merge<T: PartialOrd + Copy>(a: &Vec<T>, b: &Vec<T>, out: &mut Vec<T>) {
+    let (mut i, mut j, mut k) = (0, 0, 0);
+
+    while i < a.len()  &&  j < b.len() {
+        if a[i] < b[j] {
+            out[k] = a[i];
+            i += 1;
+        } else {
+            out[k] = b[j];
+            j += 1;
+        }
+        k += 1;
+    }
+
+    while i < a.len() {
+        out[k] = a[i];
+        i += 1;
+        k += 1;
+    }
+
+    while j < b.len() {
+        out[k] = b[j];
+        j += 1;
+        k += 1;
+    }
+}
+
+// O(nlog(n))
+fn merge_sort<T: PartialOrd + Copy>(mut a: &mut Vec<T>) {
+    if a.len() == 1 {
+        return;
+    }
+    let mid = a.len() / 2;
+    let mut half_1 = a[..mid].to_vec();
+    let mut half_2 = a[mid..].to_vec();
+    merge_sort(&mut half_1);
+    merge_sort(&mut half_2);
+    merge(&half_1, &half_2, &mut a);
+}
+
+
 fn print_array<T: Display>(slice: &[T]) {
     println!("{}", &arr_to_string(slice));
 }
 
 
 fn main() {
-    let mut arr1 = [5, 4, 3, 2, 1, 10];
+    let mut arr1 = [5, 4, 3, 2, 1, 10].to_vec();
     println!("Unsorted:");
     print_array(&arr1);
-    selection_sort(&mut arr1);
-    println!("Selection sorted:");
+    merge_sort(&mut arr1);
+    println!("Merge sorted:");
     print_array(&arr1);
 }
